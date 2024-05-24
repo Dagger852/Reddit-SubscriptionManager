@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Subreddits</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      padding: 20px;
+    }
+    
+    .table {
+      margin-top: 20px;
+    }
+    
+    .table th {
+      cursor: pointer;
+    }
+    
+    .table tbody tr:nth-child(odd) {
+      background-color: #f8f9fa;
+    }
+    
+    .table tbody tr:hover {
+      background-color: #e9ecef;
+    }
+    
+    .dark-mode {
+      background-color: #343a40;
+      color: #fff;
+    }
+    
+    .dark-mode .table {
+      background-color: #454d55;
+      color: #fff;
+    }
+    
+    .dark-mode .table th {
+      background-color: #343a40;
+      color: #fff;
+    }
+    
+    .dark-mode .table tbody tr:nth-child(odd) {
+      background-color: #454d55;
+    }
+    
+    .dark-mode .table tbody tr:hover {
+      background-color: #6c757d;
+    }
+    
+    .dark-mode .form-control {
+      background-color: #454d55;
+      color: #fff;
+    }
+    
+    .dark-mode .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+    
+    .dark-mode .btn-primary:hover {
+      background-color: #0069d9;
+      border-color: #0062cc;
+    }
+    /* Responsive Table */
+    @media screen and (max-width: 600px) {
+      .table-responsive {
+        overflow-x: auto;
+      }
+      .table-responsive table {
+        width: 100%;
+        min-width: 600px;
+      }
+    }
+  </style>
+</head>
+<body class="dark-mode">
+  <div class="container">
+    <h1>My Subreddits</h1>
+
+    
+      <div class="form-group">
+        <div class="custom-control custom-switch">
+          <input type="checkbox" class="custom-control-input" id="darkModeSwitch" checked>
+          <label class="custom-control-label" for="darkModeSwitch">Dark Mode</label>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="searchInput">Search:</label>
+            <input type="text" class="form-control" id="searchInput" placeholder="Enter search query">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="filterColumn">Filter Column:</label>
+            <select class="form-control" id="filterColumn">
+              <option value="">Select Column</option>
+              <option value="name">Name</option>
+              <option value="type">Type</option>
+              <option value="rank">Rank</option>
+              <option value="vip">VIP</option>
+              <option value="free">Free</option>
+              <option value="rr">RR</option>
+              <option value="pp">PP</option>
+              <option value="altAcct1">Alt Acct 1</option>
+              <option value="altAcct2">Alt Acct 2</option>
+              <option value="deleted">Deleted</option>
+              <option value="tags">Tags</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="filterValue">Filter Value:</label>
+            <input type="text" class="form-control" id="filterValue" placeholder="Enter filter value">
+          </div>
+        </div>
+      </div>
+      
+
+    <div class="row mb-3">
+      <div id="loadingIndicator" class="d-none">
+        <div class="spinner-border" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+      
+      <div id="feedbackContainer"></div>
+      <div class="col-md-4">
+        <input type="text" class="form-control" id="searchInput" placeholder="Search...">
+      </div>
+      <div class="col-md-4">
+        <select class="form-control" id="typeFilter">
+          <option value="">All Types</option>
+          <option value="Subreddit">Subreddit</option>
+          <option value="User">User</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <button class="btn btn-primary" id="filterBtn">Filter</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+      </div>
+    </div>
+
+    <div class="row mb-4">
+      <a href="G:\Maker Files\Coding\Reddit Subscription Manager\templates\setup.html" class="btn btn-primary">Initial Setup</a>
+        <button class="btn btn-primary" id="exportCsvBtn">Export as CSV</button>
+        <button class="btn btn-primary" id="exportJsonBtn">Export as JSON</button>
+        <button class="btn btn-primary" id="refreshBtn">Refresh Now</button>
+      </div>
+
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th class="sortable">Subreddit</th>
+            <th class="sortable">Type</th>
+            <th class="sortable">Name</th>
+            <th class="sortable">Rank</th>
+            <th>VIP</th>
+            <th>Free</th>
+            <th>RR</th>
+            <th>PP</th>
+            <th>Alt Acct 1</th>
+            <th>Alt Acct 2</th>
+            <th>Deleted</th>
+            <th>Tags</th>
+            <th>Other</th>
+          </tr>
+        </thead>
+        <tbody id="subredditsTable">
+          <!-- Table rows will be dynamically populated -->
+        </tbody>
+      </table>
+    </div>
+
+    <nav>
+      <ul class="pagination justify-content-center" id="paginationNav">
+        <!-- Pagination links will be dynamically generated -->
+      </ul>
+    </nav>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      // Add your existing JavaScript code here
+
+      // Client-side sorting
+      $('.sortable').click(function() {
+        var table = $(this).parents('table').eq(0);
+        var rows = table.find('tr:gt(0)').toArray().sort(comparer($(this).index()));
+        this.asc = !this.asc;
+        if (!this.asc) {
+          rows = rows.reverse();
+        }
+        table.children('tbody').empty().html(rows);
+      });
+
+      function comparer(index) {
+        return function(a, b) {
+          var valA = getCellValue(a, index), valB = getCellValue(b, index);
+          return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.localeCompare(valB);
+        };
+      }
+
+      function getCellValue(row, index) {
+        return $(row).children('td').eq(index).text();
+      }
+
+      // Pagination
+      var rowsPerPage = 10;
+      var rows = $('#subredditsTable tr');
+      var numPages = Math.ceil(rows.length / rowsPerPage);
+      var currentPage = 1;
+
+      function showPage(page) {
+        var startIndex = (page - 1) * rowsPerPage;
+        var endIndex = startIndex + rowsPerPage;
+
+        rows.hide();
+        rows.slice(startIndex, endIndex).show();
+
+        $('#paginationNav li').removeClass('active');
+        $('#paginationNav li:eq(' + (page - 1) + ')').addClass('active');
+      }
+
+      function updatePagination() {
+        $('#paginationNav').empty();
+        numPages = Math.ceil(rows.filter(':visible').length / rowsPerPage);
+
+        for (var i = 0; i < numPages; i++) {
+          var pageNum = i + 1;
+          $('#paginationNav').append('<li class="page-item"><a class="page-link" href="#">' + pageNum + '</a></li>');
+        }
+
+        $('#paginationNav li:first-child').addClass('active');
+
+        $('#paginationNav li').click(function() {
+          currentPage = parseInt($(this).text());
+          showPage(currentPage);
+        });
+      }
+
+      updatePagination();
+      showPage(currentPage);
+
+      // Filtering and searching
+      function filterTable() {
+        var searchQuery = $('#searchInput').val().toLowerCase();
+        var typeFilter = $('#typeFilter').val();
+
+        rows.filter(function() {
+          var subredditName = $(this).find('td:eq(0)').text().toLowerCase();
+          var subredditType = $(this).find('td:eq(1)').text();
+
+          if (typeFilter && subredditType !== typeFilter) {
+            return false;
+          }
+
+          if (searchQuery && subredditName.indexOf(searchQuery) === -1) {
+            return false;
+          }
+
+          return true;
+        }).show();
+
+        rows.filter(function() {
+          var subredditName = $(this).find('td:eq(0)').text().toLowerCase();
+          var subredditType = $(this).find('td:eq(1)').text();
+
+          if (typeFilter && subredditType !== typeFilter) {
+            return true;
+          }
+
+          if (searchQuery && subredditName.indexOf(searchQuery) === -1) {
+            return true;
+          }
+
+          return false;
+        }).hide();
+
+        updatePagination();
+        showPage(1);
+      }
+
+      $('#filterBtn').click(filterTable);
+      $('#searchInput, #typeFilter').change(filterTable);
+
+      $('#resetBtn').click(function() {
+        $('#searchInput').val('');
+        $('#typeFilter').val('');
+        rows.show();
+        updatePagination();
+        showPage(1);
+      });
+    });
+  </script>
+</body>
+</html> 
