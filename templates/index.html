@@ -1,273 +1,346 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="UTF-8">
     <title>My Subreddits</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/Data_Tables.css">
     <style>
-      body {
-        padding: 20px;
-        display: flex;
-      }
+        body {
+            padding: 20px;
+            display: flex;
+        }
 
-      .sidebar {
-        height: 100vh;
-        width: 250px;
-        position: fixed;
-        top: 0;
-        left: 0;
-        background-color: #343a40;
-        padding-top: 20px;
-        transition: 0.3s;
-        overflow-x: hidden;
-      }
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #343a40;
+            padding-top: 20px;
+            transition: 0.3s;
+            overflow-x: hidden;
+        }
 
-      .sidebar a {
-        padding: 10px 15px;
-        text-decoration: none;
-        font-size: 18px;
-        color: white;
-        display: block;
-        transition: 0.3s;
-      }
+        .sidebar a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            transition: 0.3s;
+        }
 
-      .sidebar a:hover {
-        background-color: #575d63;
-      }
+        .sidebar a:hover {
+            background-color: #575d63;
+        }
 
-      .sidebar .closebtn {
-        position: absolute;
-        top: 10px;
-        right: 25px;
-        font-size: 36px;
-      }
+        .sidebar .closebtn {
+            position: absolute;
+            top: 10px;
+            right: 25px;
+            font-size: 36px;
+        }
 
-      .sidebar-header {
-        padding: 10px 15px;
-        font-size: 24px;
-        color: white;
-      }
+        .sidebar-header {
+            padding: 10px 15px;
+            font-size: 24px;
+            color: white;
+        }
 
-      .main-content {
-        margin-left: 260px; /* Same as the width of the sidebar */
-        padding: 20px;
-        width: 100%;
-      }
+        .main-content {
+            margin-left: 260px; /* Same as the width of the sidebar */
+            padding: 20px;
+            width: 100%;
+        }
 
-      #sidebarCollapseBtn {
-        font-size: 30px;
-        cursor: pointer;
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        color: white;
-        z-index: 1;
-      }
+        #sidebarCollapseBtn {
+            font-size: 30px;
+            cursor: pointer;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: white;
+            z-index: 1;
+        }
 
-      /* Dark mode styles */
-      .dark-mode {
-        background-color: #121212;
-        color: white;
-      }
+        /* Dark mode styles */
+        .dark-mode {
+            background-color: #121212;
+            color: white;
+        }
 
-      .dark-mode .sidebar {
-        background-color: #1f1f1f;
-      }
+        .dark-mode .sidebar {
+            background-color: #1f1f1f;
+        }
 
-      .dark-mode .sidebar a {
-        color: white;
-      }
+        .dark-mode .sidebar a {
+            color: white;
+        }
 
-      .dark-mode .sidebar a:hover {
-        background-color: #333;
-      }
+        .dark-mode .sidebar a:hover {
+            background-color: #333;
+        }
 
-      .dark-mode .sidebar .closebtn {
-        color: white;
-      }
+        .dark-mode .sidebar .closebtn {
+            color: white;
+        }
 
-      .dark-mode .form-control {
-        background-color: #333;
-        color: white;
-        border: 1px solid #555;
-      }
+        .dark-mode .form-control {
+            background-color: #333;
+            color: white;
+            border: 1px solid #555;
+        }
 
-      .dark-mode .form-control::placeholder {
-        color: #bbb;
-      }
+        .dark-mode .form-control::placeholder {
+            color: #bbb;
+        }
 
-      .dark-mode .custom-control-label::before {
-        background-color: #333;
-        border: 1px solid #555;
-      }
+        .dark-mode .custom-control-label::before {
+            background-color: #333;
+            border: 1px solid #555;
+        }
 
-      .container {
-        display: flex;
-        flex-direction: row;
-      }
+        .container {
+            display: flex;
+            flex-direction: row;
+        }
 
-      .row {
-        width: 100%;
-      }
+        .row {
+            width: 100%;
+        }
 
-      .col {
-        flex: 1 1 auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        box-sizing: border-box;
-      }
+        .col {
+            flex: 1 1 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
     </style>
-  </head>
-  <body class="dark-mode">
+</head>
+<body class="dark-mode">
     <div id="mySidebar" class="sidebar">
-      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
-      <div class="sidebar-header" id="redditName">Reddit Name</div>
-      <a href="setup.html">Initial Setup</a>
-      <a href="#" id="exportCsvBtn">Export as CSV</a>
-      <a href="#" id="exportJsonBtn">Export as JSON</a>
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+        <div class="sidebar-header" id="redditName">Reddit Name</div>
+        <a href="setup.html">Initial Setup</a>
+        <a href="#" id="exportCsvBtn">Export as CSV</a>
+        <a href="#" id="exportJsonBtn">Export as JSON</a>
     </div>
     <div class="main-content">
-      <button class="btn btn-primary" id="sidebarCollapseBtn" onclick="openNav()">Open Subreddits</button>
-      <table id="myTable" class="table table-striped table-bordered">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Subscribers</th>
-            <th>Link</th>
-            <th>Deleted</th>
-            <th>Tags</th>
-            <th>Other</th>
-          </tr>
-        </thead>
-        <tbody>
-        </tbody>
-      </table>
+        <button class="btn btn-primary" id="sidebarCollapseBtn" onclick="openNav()">Open Subreddits</button>
+        <button id="darkModeToggle" class="btn btn-secondary">Toggle Dark Mode</button>
+        <form id="subredditForm">
+            <input type="text" id="subredditName" placeholder="Enter subreddit name" required>
+            <button type="submit" class="btn btn-primary">Add Subreddit</button>
+        </form>
+        <table id="myTable" class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Subscribers</th>
+                    <th>Link</th>
+                    <th>Deleted</th>
+                    <th>Tags</th>
+                    <th>Other</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/Data_Tables.js"></script>
     <script>
-      const userSubreddits = [];
-      let redditName = localStorage.getItem('redditName');
-      document.getElementById('redditName').textContent = redditName;
-      let userSubredditsData = localStorage.getItem('userSubreddits');
-      if (userSubredditsData) {
-        userSubredditsData = JSON.parse(userSubredditsData);
-        for (let i = 0; i < userSubredditsData.length; i++) {
-          let row = document.createElement('tr');
-          let nameCell = document.createElement('td');
-          nameCell.textContent = userSubredditsData[i].name;
-          let descCell = document.createElement('td');
-          descCell.textContent = userSubredditsData[i].description;
-          let subscribersCell = document.createElement('td');
-          subscribersCell.textContent = userSubredditsData[i].subscribers;
-          let linkCell = document.createElement('td');
-          let link = document.createElement('a');
-          link.href = userSubredditsData[i].url;
-          link.textContent = 'Visit';
-          linkCell.appendChild(link);
-          row.appendChild(nameCell);
-          row.appendChild(descCell);
-          row.appendChild(subscribersCell);
-          row.appendChild(linkCell);
-          document.getElementById('myTable').appendChild(row);
+        const userSubreddits = [];
+        let redditName = localStorage.getItem('redditName');
+        document.getElementById('redditName').textContent = redditName;
+        let userSubredditsData = localStorage.getItem('userSubreddits');
+        if (userSubredditsData) {
+            userSubredditsData = JSON.parse(userSubredditsData);
+            for (let i = 0; i < userSubredditsData.length; i++) {
+                let row = document.createElement('tr');
+                let nameCell = document.createElement('td');
+                nameCell.textContent = userSubredditsData[i].name;
+                let descCell = document.createElement('td');
+                descCell.textContent = userSubredditsData[i].description;
+                let subscribersCell = document.createElement('td');
+                subscribersCell.textContent = userSubredditsData[i].subscribers;
+                let linkCell = document.createElement('td');
+                let link = document.createElement('a');
+                link.href = userSubredditsData[i].url;
+                link.textContent = 'Visit';
+                linkCell.appendChild(link);
+                row.appendChild(nameCell);
+                row.appendChild(descCell);
+                row.appendChild(subscribersCell);
+                row.appendChild(linkCell);
+                document.getElementById('myTable').appendChild(row);
+            }
         }
-      }
-      document.getElementById('exportCsvBtn').addEventListener('click', function () {
-        exportAsCsv(userSubredditsData);
-      });
-      document.getElementById('exportJsonBtn').addEventListener('click', function () {
-        exportAsJson(userSubredditsData);
-      });
-      function openNav() {
-        document.getElementById('mySidebar').style.width = '250px';
-      }
-      function closeNav() {
-        document.getElementById('mySidebar').style.width = '0';
-      }
-      function exportAsCsv(subreddits) {
-        let csvContent = 'data:text/csv;charset=utf-8,Name,Description,Subscribers,URL\n';
-        for (let i = 0; i < subreddits.length; i++) {
-          let row = `${subreddits[i].name},${subreddits[i].description},${subreddits[i].subscribers},${subreddits[i].url}\n`;
-          csvContent += row;
-        }
-        let encodedUri = encodeURI(csvContent);
-        let link = document.createElement('a');
-        link.setAttribute('href', encodedUri);
-        link.setAttribute('download', 'subreddits.csv');
-        document.body.appendChild(link);
-        link.click();
-      }
-      function exportAsJson(subreddits) {
-        let jsonContent = JSON.stringify(subreddits);
-        let encodedUri = encodeURI('data:text/json;charset=utf-8,' + jsonContent);
-        let link = document.createElement('a');
-        link.setAttribute('href', encodedUri);
-        link.setAttribute('download', 'subreddits.json');
-        document.body.appendChild(link);
-        link.click();
-      }
+        document.getElementById('exportCsvBtn').addEventListener('click', function () {
+            exportAsCsv(userSubredditsData);
+        });
+        document.getElementById('exportJsonBtn').addEventListener('click', function () {
+            exportAsJson(userSubredditsData);
+        });
+        document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
+        document.getElementById('subredditForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const subredditName = document.getElementById('subredditName').value;
+            addSubreddit(subredditName);
+        });
+        document.querySelectorAll('#myTable tbody tr').forEach(row => {
+            row.addEventListener('click', function () {
+                displaySubredditDetails({ name: this.cells[0].textContent });
+            });
+        });
 
-      // Export data as CSV
-function exportCsv() {
-    var csvData = [];
-    var headers = ['Name', 'Type', 'Rank', 'VIP', 'Free', 'RR', 'PP', 'Alt Acct 1', 'Alt Acct 2', 'Deleted', 'Tags', 'Other'];
-    csvData.push(headers.join(','));
-  
-    $('#subredditsTable tbody tr').each(function() {
-      var row = [];
-      $(this).find('td').each(function() {
-        row.push($(this).text());
-      });
-      csvData.push(row.join(','));
-    });
-  
-    var csvContent = csvData.join('\n');
-    var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    var link = document.createElement('a');
-    if (link.download !== undefined) {
-      var url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', 'subreddits_data.csv');
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  }
-  
-  // Export data as JSON
-  function exportJson() {
-    var jsonData = [];
-  
-    $('#subredditsTable tbody tr').each(function() {
-      var row = {};
-      $(this).find('td').each(function(index) {
-        var header = ['name', 'type', 'rank', 'vip', 'free', 'rr', 'pp', 'altAcct1', 'altAcct2', 'deleted', 'tags', 'other'][index];
-        row[header] = $(this).text();
-      });
-      jsonData.push(row);
-    });
-  
-    var jsonContent = JSON.stringify(jsonData, null, 2);
-    var blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' });
-    var link = document.createElement('a');
-    if (link.download !== undefined) {
-      var url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', 'subreddits_data.json');
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  }
-  
-  // Attach event listeners to the export buttons
-  document.getElementById('exportCsvBtn').addEventListener('click', exportCsv);
-  document.getElementById('exportJsonBtn').addEventListener('click', exportJson);
+        function openNav() {
+            document.getElementById('mySidebar').style.width = '250px';
+        }
+        function closeNav() {
+            document.getElementById('mySidebar').style.width = '0';
+        }
+        function exportAsCsv(subreddits) {
+            let csvContent = 'data:text/csv;charset=utf-8,Name,Description,Subscribers,URL\n';
+            for (let i = 0; i < subreddits.length; i++) {
+                let row = `${subreddits[i].name},${subreddits[i].description},${subreddits[i].subscribers},${subreddits[i].url},${subreddits[i].link},${subreddits[i].deleted},${subreddits[i].tags}\n`;
+                csvContent += row;
+            }
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'subreddits.csv');
+            document.body.appendChild(link);
+            link.click();
+        }
+        function exportAsJson(subreddits) {
+            let jsonContent = JSON.stringify(subreddits);
+            let encodedUri = encodeURI('data:text/json;charset=utf-8,' + jsonContent);
+            let link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'subreddits.json');
+            document.body.appendChild(link);
+            link.click();
+        }
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+        function displaySubredditDetails(subreddit) {
+            alert(`Displaying details for ${subreddit.name}`);
+        }
+        function addSubreddit(subredditName) {
+            const newRow = document.createElement('tr');
+            const nameCell = document.createElement('td');
+            nameCell.textContent = subredditName;
+            newRow.appendChild(nameCell);
+            document.querySelector('#myTable tbody').appendChild(newRow);
+
+            let userSubredditsData = JSON.parse(localStorage.getItem('userSubreddits')) || [];
+            userSubredditsData.push({ name: subredditName });
+            localStorage.setItem('userSubreddits', JSON.stringify(userSubredditsData));
+        }
+        function addSubreddit(subredditName) {
+            const existingSubreddit = Array.from(document.querySelectorAll('#myTable tbody tr')).find(row => row.cells[0].textContent === subredditName);
+            
+            if (existingSubreddit) {
+                alert('Subreddit already exists in the table!');
+                return;
+            }
+
+            // Create a modal or form to prompt for additional information
+            const modal = document.createElement('div');
+            modal.classList.add('modal');
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h3>Add Subreddit: ${subredditName}</h3>
+                    <form id="additionalInfoForm">
+                        <label>
+                            <input type="checkbox" name="deleted"> Deleted
+                        </label>
+                        <span class="helper-text">Check this box if the subreddit has been deleted.</span>
+                        <br>
+                        <label>
+                            Tags: <input type="text" name="tags">
+                        </label>
+                        <span class="helper-text">Enter relevant tags for the subreddit, separated by commas.</span>
+                        <br>
+                        <label>
+                            Other: <input type="text" name="other">
+                        </label>
+                        <span class="helper-text">Enter any additional information about the subreddit.</span>
+                        <br>
+                        <button type="submit">Save</button>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            const additionalInfoForm = document.getElementById('additionalInfoForm');
+            additionalInfoForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const deleted = this.elements.deleted.checked;
+                const tags = this.elements.tags.value;
+                const other = this.elements.other.value;
+
+                const newRow = document.createElement('tr');
+                const nameCell = document.createElement('td');
+                nameCell.textContent = subredditName;
+                const deletedCell = document.createElement('td');
+                deletedCell.textContent = deleted ? 'Yes' : 'No';
+                const tagsCell = document.createElement('td');
+                tagsCell.textContent = tags;
+                const otherCell = document.createElement('td');
+                otherCell.textContent = other;
+
+                newRow.appendChild(nameCell);
+                newRow.appendChild(document.createElement('td')); // Empty description cell
+                newRow.appendChild(document.createElement('td')); // Empty subscribers cell
+                newRow.appendChild(document.createElement('td')); // Empty link cell
+                newRow.appendChild(deletedCell);
+                newRow.appendChild(tagsCell);
+                newRow.appendChild(otherCell);
+
+                document.querySelector('#myTable tbody').appendChild(newRow);
+
+                let userSubredditsData = JSON.parse(localStorage.getItem('userSubreddits')) || [];
+                userSubredditsData.push({
+                    name: subredditName,
+                    deleted: deleted,
+                    tags: tags,
+                    other: other
+                });
+                localStorage.setItem('userSubreddits', JSON.stringify(userSubredditsData));
+
+                modal.remove();
+            });
+
+            modal.style.display = 'block';
+        }
     </script>
-  </body>
+</body>
 </html>
