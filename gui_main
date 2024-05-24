@@ -1,0 +1,115 @@
+import sys
+import json
+import csv
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QPushButton, QTableWidget, QTableWidgetItem, QLineEdit, QDialog, QLabel, QFormLayout, QDialogButtonBox, QMessageBox
+from PyQt5.QtCore import Qt
+
+class AddSubredditDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Add Subreddit")
+        self.layout = QFormLayout(self)
+
+        self.name_input = QLineEdit(self)
+        self.desc_input = QLineEdit(self)
+        self.subscribers_input = QLineEdit(self)
+        self.link_input = QLineEdit(self)
+        self.deleted_input = QLineEdit(self)
+        self.tags_input = QLineEdit(self)
+        self.other_input = QLineEdit(self)
+
+        self.layout.addRow("Name:", self.name_input)
+        self.layout.addRow("Description:", self.desc_input)
+        self.layout.addRow("Subscribers:", self.subscribers_input)
+        self.layout.addRow("Link:", self.link_input)
+        self.layout.addRow("Deleted:", self.deleted_input)
+        self.layout.addRow("Tags:", self.tags_input)
+        self.layout.addRow("Other:", self.other_input)
+
+        self.buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self)
+        self.buttons.accepted.connect(self.accept)
+        self.buttons.rejected.connect(self.reject)
+        self.layout.addWidget(self.buttons)
+
+    def get_data(self):
+        return {
+            "name": self.name_input.text(),
+            "description": self.desc_input.text(),
+            "subscribers": self.subscribers_input.text(),
+            "link": self.link_input.text(),
+            "deleted": self.deleted_input.text(),
+            "tags": self.tags_input.text(),
+            "other": self.other_input.text()
+        }
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Reddit Subscription Manager")
+        self.setGeometry(100, 100, 800, 600)
+
+        self.layout = QVBoxLayout()
+
+        self.table = QTableWidget(0, 7)
+        self.table.setHorizontalHeaderLabels(["Name", "Description", "Subscribers", "Link", "Deleted", "Tags", "Other"])
+        self.layout.addWidget(self.table)
+
+        self.add_button = QPushButton("Add Subreddit")
+        self.add_button.clicked.connect(self.add_subreddit)
+        self.layout.addWidget(self.add_button)
+
+        self.export_csv_button = QPushButton("Export as CSV")
+        self.export_csv_button.clicked.connect(self.export_as_csv)
+        self.layout.addWidget(self.export_csv_button)
+
+        self.export_json_button = QPushButton("Export as JSON")
+        self.export_json_button.clicked.connect(self.export_as_json)
+        self.layout.addWidget(self.export_json_button)
+
+        self.container = QMainWindow()
+        self.container.setLayout(self.layout)
+        self.setCentralWidget(self.container)
+
+        self.subreddits = []
+
+    def add_subreddit(self):
+        dialog = AddSubredditDialog()
+        if dialog.exec_() == QDialog.Accepted:
+            data = dialog.get_data()
+            if any(subreddit['name'].lower() == data['name'].lower() for subreddit in self.subreddits):
+                QMessageBox.warning(self, "Error", "Subreddit already exists in the table.")
+                return
+
+            self.subreddits.append(data)
+            self.update_table()
+
+    def update_table(self):
+        self.table.setRowCount(0)
+        for subreddit in self.subreddits:
+            row_position = self.table.rowCount()
+            self.table.insertRow(row_position)
+            self.table.setItem(row_position, 0, QTableWidgetItem(subreddit["name"]))
+            self.table.setItem(row_position, 1, QTableWidgetItem(subreddit["description"]))
+            self.table.setItem(row_position, 2, QTableWidgetItem(subreddit["subscribers"]))
+            self.table.setItem(row_position, 3, QTableWidgetItem(subreddit["link"]))
+            self.table.setItem(row_position, 4, QTableWidgetItem(subreddit["deleted"]))
+            self.table.setItem(row_position, 5, QTableWidgetItem(subreddit["tags"]))
+            self.table.setItem(row_position, 6, QTableWidgetItem(subreddit["other"]))
+
+    def export_as_csv(self):
+        with open('subreddits.csv', 'w', newline='') as csvfile:
+            fieldnames = ["name", "description", "subscribers", "link", "deleted", "tags", "other"]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            for subreddit in self.subreddits:
+                writer.writerow(subreddit)
+
+    def export_as_json(self):
+        with open('subreddits.json', 'w') as jsonfile:
+            json.dump(self.subreddits, jsonfile, indent=4)
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())
