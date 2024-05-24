@@ -150,6 +150,7 @@
     <div class="main-content">
         <button class="btn btn-primary" id="sidebarCollapseBtn" onclick="openNav()">Open Subreddits</button>
         <button id="darkModeToggle" class="btn btn-secondary">Toggle Dark Mode</button>
+        <button id="clearEntriesBtn" class="btn btn-danger">Clear Entries</button>
         <form id="subredditForm">
             <input type="text" id="subredditName" placeholder="Enter subreddit name" required>
             <button type="submit" class="btn btn-primary">Add Subreddit</button>
@@ -216,6 +217,14 @@
             row.addEventListener('click', function () {
                 displaySubredditDetails({ name: this.cells[0].textContent });
             });
+        });
+
+        document.getElementById('clearEntriesBtn').addEventListener('click', function () {
+            // Clear the table body
+            document.querySelector('#myTable tbody').innerHTML = '';
+
+            // Optionally, clear the local storage if you are storing data there
+            localStorage.removeItem('userSubreddits');
         });
 
         function openNav() {
