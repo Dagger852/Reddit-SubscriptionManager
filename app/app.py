@@ -126,7 +126,7 @@ def update_database():
         new_df['last_updated'] = datetime.now()  # Add a 'last_updated' column with the current datetime
 
         # Save the dataframe to a SQLite database
-        conn = sqlite3.connect('G:/Maker Files/Coding/Reddit Subscription Manager/app/data/subreddits.db')
+        conn = sqlite3.connect('app/data/subreddits.db')
 
         # Load the existing data
         existing_df = pd.read_sql_query('SELECT * FROM subreddits', conn)
@@ -221,7 +221,7 @@ def get_data():
 
     try:
         # Connect to the database and get the data
-        conn = sqlite3.connect('G:/Maker Files/Coding/Reddit Subscription Manager/app/data/subreddits.db')
+        conn = sqlite3.connect('app/data/subreddits.db')
         df = pd.read_sql_query('SELECT * FROM subreddits', conn)
         logger.info(f"Retrieved data from the database: {df}")
         conn.close()
@@ -264,7 +264,7 @@ def update_database():
         new_df['last_updated'] = new_df['last_updated'].astype(str)
 
         # Save the dataframe to a SQLite database
-        conn = sqlite3.connect('G:/Maker Files/Coding/Reddit Subscription Manager/app/data/subreddits.db')
+        conn = sqlite3.connect('app/data/subreddits.db')
 
         # Load the existing data
         existing_df = pd.read_sql_query('SELECT * FROM subreddits', conn)
@@ -296,7 +296,7 @@ def update_data():
         user_input = request.json
 
         # Connect to the database
-        conn = sqlite3.connect('G:/Maker Files/Coding/Reddit Subscription Manager/app/data/subreddits.db')
+        conn = sqlite3.connect('app/data/subreddits.db')
         c = conn.cursor()
 
         # Update the database based on the user input
@@ -324,7 +324,7 @@ def clear_entries():
 
     try:
         # Connect to the database
-        conn = sqlite3.connect('G:/Maker Files/Coding/Reddit Subscription Manager/app/data/subreddits.db')
+        conn = sqlite3.connect('app/data/subreddits.db')
         c = conn.cursor()
 
         # Delete all entries from the 'subreddits' table
