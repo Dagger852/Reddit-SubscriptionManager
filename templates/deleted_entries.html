@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deleted Entries</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <style>
+        /* Add any custom styles for the deleted entries page */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Deleted Entries</h1>
+        <div class="mt-4">
+            <a href="index.html" class="btn btn-primary">Back to Main</a>
+        </div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Rank</th>
+                    <th>VIP</th>
+                    <th>Free</th>
+                    <th>RR</th>
+                    <th>PP</th>
+                    <th>Alt Acct 1</th>
+                    <th>Alt Acct 2</th>
+                    <th>Tags</th>
+                    <th>Other</th>
+                </tr>
+            </thead>
+            <tbody id="deletedEntriesTable">
+                <!-- Deleted entries will be dynamically populated here -->
+            </tbody>
+        </table>
+
+        
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Retrieve deleted entries from localStorage and populate the table
+        let deletedEntries = JSON.parse(localStorage.getItem("deletedEntries")) || [];
+        const deletedEntriesTable = document.getElementById("deletedEntriesTable");
+
+        deletedEntries.forEach(entry => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${entry.name}</td>
+                <td>${entry.type}</td>
+                <td>${entry.rank}</td>
+                <td>${entry.vip ? "Yes" : "No"}</td>
+                <td>${entry.free ? "Yes" : "No"}</td>
+                <td>${entry.rr ? "Yes" : "No"}</td>
+                <td>${entry.pp ? "Yes" : "No"}</td>
+                <td>${entry.altAcct1}</td>
+                <td>${entry.altAcct2}</td>
+                <td>${entry.tags}</td>
+                <td>${entry.other}</td>
+            `;
+            deletedEntriesTable.appendChild(row);
+        });
+    </script>
+</body>
+</html>
