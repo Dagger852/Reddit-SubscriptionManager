@@ -73,25 +73,33 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 - [PRAW (Python Reddit API Wrapper)](https://praw.readthedocs.io/en/latest/) for providing the API wrapper for Reddit.
 
 
-    ##  TO DO LIST
-        convert hyperlink into the NAME column (with display name only)
-        Update table to load filtering and sorting first,
-            then update pagination 
-                Update pagination to move deleted entries to separate page (in sidebar?)
-                Update pagination to treat IGNORE entries to separate page (in sidebar?)
-        Filter Column values (and delete filter value box?)
-        Fix .csv export function
+##  TO DO LIST
+    convert hyperlink into the NAME column (with display name only)
+    Update table to load filtering and sorting first,
+        then update pagination 
+            Update pagination to move deleted entries to separate page (in sidebar?)
+            Update pagination to treat IGNORE entries to separate page (in sidebar?)
+    Filter Column values (and delete filter value box?)
+    Add the ability to rearrange the order of subreddits in the table using drag and drop.
+    Fix .csv export function
 
-        Change Sidebar to be collapsed by default
-        Make other table fields editable and easy to write to
-        Adjust page sizing for open/close of sidebar
-        add logging to CLEAR ENTRIES
+    Change Sidebar to be collapsed by default
+    Make other table fields editable and easy to write to
+    Adjust page sizing for open/close of sidebar
+    add logging to CLEAR ENTRIES
+    Add the ability to edit existing subreddit entries in the table
+    Implement a confirmation dialog when deleting subreddits
+   
+Enhanced Data Management
+    •	Bulk Actions: Allow users to perform bulk actions, such as deleting multiple entries or exporting selected data.
+    •	Data Validation: Implement client-side and server-side validation to ensure data integrity before saving it to the database.
 
-        Modal box changes
-            Change to black font
-            Add a "CANCEL" button, 
-                which cancels the add-subreddit function altogether
-            
 
-            on Cancel click, close Modal box 
-            on Save click,  write to .db  and Close Modal box
+
+Modal box changes
+    •	Change to black font
+    •	Add a "CANCEL" button, 
+            which cancels the add-subreddit function altogether
+    •	on Cancel click, close Modal box 
+    •	on Save click,  write to .db  and Close Modal box
+
