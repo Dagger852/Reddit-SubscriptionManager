@@ -1,0 +1,166 @@
+body {
+    padding: 20px;
+    display: flex;
+    background-color: #343a40; /* sidebar hover background */
+    color: white;
+}
+.sidebar {
+    height: 100vh;
+    width: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #575d63; /* sidebar background #575d63; */
+    padding-top: 20px;
+    padding-bottom: 80px;
+    transition: 0.3s;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar a {
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 18px;
+    color: white;          /* sidebar font color; White */
+    display: block;
+    transition: 0.3s;
+}
+
+.sidebar a:hover {
+    background-color: #343a40; /* sidebar hover background */
+}
+
+.sidebar .closebtn {
+    position: absolute;
+    top: 10px;
+    right: 25px;
+    font-size: 36px;
+}
+
+.sidebar-header {
+    padding: 10px 15px;
+    font-size: 24px;
+    color: white;               /* sidebarheader font (redditname) */
+}
+
+.sidebar-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    background-color: #343a40;
+    border-radius: 4px;
+    z-index: 999;
+}
+
+.sidebar-bottom .btn {
+    margin: 0;
+}
+
+.main-content {
+    margin-left: 0;
+    padding: 20px;
+    width: calc(100% - 20px);
+    transition: 0.3s;
+}
+
+.sidebar-open .main-content {
+    width: calc(100% - 270px);
+    margin-left: 250px;
+}
+
+#sidebarCollapseBtn {
+    font-size: 30px;
+    cursor: pointer;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    color: white;
+    z-index: 1;
+}
+
+.table {
+    margin-top: 20px;
+    color: white;
+}
+
+.table th {
+    cursor: pointer;
+}
+
+.table tbody tr:nth-child(odd) {
+    background-color: #454d55;
+}
+
+.table tbody tr:hover {
+    background-color: #6c757d;
+}
+
+/* Dark mode styles */
+.dark-mode {
+    background-color: #121212;   /* Main page background - AMOLED */
+    color: white;
+}
+
+.dark-mode .sidebar {
+    background-color: #1f1f1f;  /* Sidebar page background - AMOLED */
+}
+
+.dark-mode .sidebar a {
+    color: white;               /* Sidebar Font background - AMOLED */
+}
+
+.dark-mode .sidebar a:hover {
+    background-color: #333;     /* Sidebar option hover - AMOLED */
+}
+
+.dark-mode .sidebar .closebtn {
+    color: white;               /* Sidebar close "X" - AMOLED */
+}
+
+.dark-mode .form-control {
+    background-color: #333;     /* Search boxes - AMOLED */
+    color: white;
+    border: 1px solid #555;
+}
+
+.dark-mode .form-control::placeholder {
+    color: #bbb;                /* Helper Text color - AMOLED */
+}
+
+.dark-mode .custom-control-label::before {
+    background-color: #333;
+    border: 1px solid #555;
+}
+
+.dark-mode .table {
+    background-color: #1f1f1f;  /* Table background - AMOLED */
+    color: white;
+}
+
+.dark-mode .table th {
+    background-color: #121212;  /* Table header background - AMOLED */
+    color: white;
+}
+
+.dark-mode .table tbody tr:nth-child(odd) {
+    background-color: #1f1f1f;  /* Table odd rows - AMOLED */
+}
+
+.dark-mode .table tbody tr:hover {
+    background-color: #333;     /* Table row hover - AMOLED */
+}
+
+@media screen and (max-width: 600px) {
+    .table-responsive {
+        overflow-x: auto;
+    }
+    .table-responsive table {
+        width: 100%;
+        min-width: 600px;
+    }
+}
