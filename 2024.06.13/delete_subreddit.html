@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Subreddit</title>
+</head>
+<body>
+    <h1>Delete Subreddit</h1>
+    <p>Are you sure you want to delete the subreddit {{ subreddit.name }}?</p>
+    <form method="POST">
+        <button type="submit">Delete</button>
+    </form>
+    <a href="{{ url_for('index') }}">Back to Subscriptions</a>
+</body>
+</html>

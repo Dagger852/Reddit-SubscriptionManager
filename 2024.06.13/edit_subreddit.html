@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Subreddit</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Subreddit</h1>
+        <form method="POST" action="{{ url_for('edit_subreddit', id=subreddit.id) }}">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ subreddit.name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" class="form-control" id="title" name="title" value="{{ subreddit.title }}" required>
+            </div>
+            <div class="form-group">
+                <label for="rank">Rank:</label>
+                <input type="text" class="form-control" id="rank" name="rank" value="{{ subreddit.rank }}">
+            </div>
+            <div class="form-group">
+                <label for="VIP">VIP:</label>
+                <input type="text" class="form-control" id="VIP" name="VIP" value="{{ subreddit.vip }}">
+            </div>
+            <div class="form-group">
+                <label for="Free">Free:</label>
+                <input type="text" class="form-control" id="Free" name="Free" value="{{ subreddit.free }}">
+            </div>
+            <div class="form-group">
+                <label for="RR">RR:</label>
+                <input type="text" class="form-control" id="RR" name="RR" value="{{ subreddit.rr }}">
+            </div>
+            <div class="form-group">
+                <label for="PP">PP:</label>
+                <input type="text" class="form-control" id="PP" name="PP" value="{{ subreddit.pp }}">
+            </div>
+            <div class="form-group">
+                <label for="AltAcct1">Alt Acct 1:</label>
+                <input type="text" class="form-control" id="AltAcct1" name="AltAcct1" value="{{ subreddit.alt_acct1 }}">
+            </div>
+            <div class="form-group">
+                <label for="AltAcct2">Alt Acct 2:</label>
+                <input type="text" class="form-control" id="AltAcct2" name="AltAcct2" value="{{ subreddit.alt_acct2 }}">
+            </div>
+            <div class="form-group">
+                <label for="Tags">Tags (comma-separated):</label>
+                <input type="text" class="form-control" id="Tags" name="Tags" value="{{ subreddit.tags }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Update Subreddit</button>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</body>
+</html>

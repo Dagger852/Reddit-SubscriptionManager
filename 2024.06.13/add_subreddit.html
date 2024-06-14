@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" class="{{ 'dark' if amoled_mode else '' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Subreddit</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --light-primary: #007bff;
+            --light-secondary: #6c757d;
+            --light-success: #28a745;
+            --light-danger: #dc3545;
+            --light-warning: #ffc107;
+            --light-info: #17a2b8;
+            --light-background: #fff;
+            --light-text: #000;
+
+            --dark-primary: #ff6347;
+            --dark-secondary: #3f3f3f;
+            --dark-success: #32cd32;
+            --dark-danger: #ff0000;
+            --dark-warning: #ffa500;
+            --dark-info: #0000ff;
+            --dark-background: #000;
+            --dark-text: #fff;
+        }
+
+        body {
+            font-family: "Lato", sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+        }
+
+        .dark-mode {
+            --primary: var(--dark-primary);
+            --secondary: var(--dark-secondary);
+            --success: var(--dark-success);
+            --danger: var(--dark-danger);
+            --warning: var(--dark-warning);
+            --info: var(--dark-info);
+            --background: var(--dark-background);
+            --text: var(--dark-text);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: var(--background);
+            border: 1px solid var(--secondary);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid var(--secondary);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--text);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add New Subreddit</h1>
+        <form method="POST" action="{{ url_for('add_subreddit') }}">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="rank">Rank:</label>
+                <input type="text" class="form-control" id="rank" name="rank">
+            </div>
+            <div class="form-group">
+                <label for="VIP">VIP:</label>
+                <input type="text" class="form-control" id="VIP" name="VIP">
+            </div>
+            <div class="form-group">
+                <label for="Free">Free:</label>
+                <input type="text" class="form-control" id="Free" name="Free">
+            </div>
+            <div class="form-group">
+                <label for="RR">RR:</label>
+                <input type="text" class="form-control" id="RR" name="RR">
+            </div>
+            <div class="form-group">
+                <label for="PP">PP:</label>
+                <input type="text" class="form-control" id="PP" name="PP">
+            </div>
+            <div class="form-group">
+                <label for="AltAcct1">Alt Acct 1:</label>
+                <input type="text" class="form-control" id="AltAcct1" name="AltAcct1">
+            </div>
+            <div class="form-group">
+                <label for="AltAcct2">Alt Acct 2:</label>
+                <input type="text" class="form-control" id="AltAcct2" name="AltAcct2">
+            </div>
+            <div class="form-group">
+                <label for="Tags">Tags (comma-separated):</label>
+                <input type="text" class="form-control" id="Tags" name="Tags">
+            </div>
+            <button type="submit" class="btn btn-primary">Add Subreddit</button>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</body>
+</html>
