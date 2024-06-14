@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" class="dark dark-mode">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Reddit Subscriptions</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <style>
+            :root { 
+                --light-primary: #007bff; 
+                --light-secondary: #6c757d; 
+                --light-success: #28a745; 
+                --light-danger: #dc3545; 
+                --light-warning: #ffc107; 
+                --light-info: #17a2b8; 
+                --light-background: #fff; 
+                --light-text: #000; 
+                --dark-primary: #ff6347; 
+                --dark-secondary: #3f3f3f; 
+                --dark-success: #32cd32; 
+                --dark-danger:#ff0000; 
+                --dark-warning: #ffa500; 
+                --dark-info: #0000ff; 
+                --dark-background: #000; 
+                --dark-text: #fff; 
+            } 
+            body { 
+                font-family: "Lato", sans-serif; 
+                background-color: var(--background); 
+                color: var(--text); 
+            } 
+            .dark-mode { 
+                --primary: var(--dark-primary);
+                --secondary: var(--dark-secondary); 
+                --success: var(--dark-success); 
+                --danger:var(--dark-danger); 
+                --warning: var(--dark-warning); 
+                --info: var(--dark-info);
+                --background: var(--dark-background); 
+                --text: var(--dark-text); 
+            } 
+            .sidebar { 
+                height: 100%; 
+                width: 0; 
+                position: fixed; 
+                z-index: 1; 
+                top: 0; 
+                left: 0;
+                background-color: #111; 
+                overflow-x: hidden; 
+                transition: 0.3s; 
+                padding-top: 60px; 
+            } 
+            .sidebar a { 
+                padding: 8px 8px 8px 32px; 
+                text-decoration: none;
+                font-size: 20px; 
+                color: #818181; 
+                display: block; 
+                transition: 0.3s; 
+            } 
+            .sidebar a:hover {
+                color: #f1f1f1; 
+            } 
+            .sidebar .closebtn { 
+                position: absolute; 
+                top: 0; 
+                right: 25px; 
+                font-size: 36px; 
+                margin-left: 50px; 
+            } 
+            .openbtn { 
+                font-size:20px; 
+                cursor: pointer; 
+                background-color: #111; 
+                color: white; 
+                padding: 10px 15px; 
+                border: none; 
+            } 
+            .openbtn:hover { 
+                background-color: #444; 
+            } 
+            #main { 
+                transition: margin-left .3s; 
+                padding: 16px; 
+            } 
+            .table-container { 
+                width: 100%; 
+                max-width: 100%; 
+            } 
+            .table { width: 100%;
+            } 
+            .toggle-button { 
+                background-color: transparent; 
+                border: none; 
+                padding: 10px; 
+                cursor: pointer; 
+                margin: 10px 32px; 
+            } 
+            .material-icons { 
+                font-size: 24px; 
+                color: #fff; 
+            } 
+            .amoled-mode { 
+                background-color: #000; 
+                color: #fff; 
+            } 
+            .amoled-mode body { 
+                background-color:#000; 
+                color: #fff;
+            } 
+            @media screen and (max-height: 450px) { 
+                .sidebar {
+                    padding-top: 15px; 
+                } 
+                .sidebar a { font-size: 18px; } 
+            }
+        </style>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    </head>
+    <body>
+        <div id="mySidebar" class="sidebar">
+            <h3>Sidebar</h3>
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+            <button id="initialSetupButton" class="btn btn-primary mt-4">Initial Setup</button>
+            <a href="#">Sync Subscriptions</a>
+            <a href="#">Export as CSV</a>
+            <a href="#">View Change Log</a>
+            <a href="#">View Deleted Entries</a>
+            <button class="toggle-button" aria-label="Toggle AMOLED mode" style="position: absolute; bottom: 10px; right: 10px;">
+                <i class="material-icons" id="toggle-icon">wb_sunny</i>
+            </button>
+        </div>
+        <div id="main">
+            <button class="openbtn" onclick="openNav()">☰</button>
+            <div class="container-fluid">
+                <h1 class="mt-4">Subscription Manager</h1>
+                <div class="table-container">
+                    <table id="subscriptionsTable" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Rank</th>
+                                <th>VIP</th>
+                                <th>Free</th>
+                                <th>RR</th>
+                                <th>PP</th>
+                                <th>Alt Acct 1</th>
+                                <th>Alt Acct 2</th>
+                                <th>Tags</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for subreddit in subreddits.items %}
+                                {% if not subreddit.deleted %}
+                                    <tr>
+                                        <td><a href="{{ subreddit.url }}" target="_blank">{{ subreddit.name }}</a></td>
+                                        <td>{{ subreddit.type }}</td>
+                                        <td>{{ subreddit.rank }}</td>
+                                        <td>{{ subreddit.vip }}</td>
+                                        <td>{{ subreddit.free }}</td>
+                                        <td>{{ subreddit.rr }}</td>
+                                        <td>{{ subreddit.pp }}</td>
+                                        <td>{{ subreddit.alt_acct1 }}</td>
+                                        <td>{{ subreddit.alt_acct2 }}</td>
+                                        <td>{{ subreddit.tags }}</td>
+                                        <td>
+                                            <a href="{{ url_for('edit_subreddit', id=subreddit.id) }}" class="btn btn-primary btn-sm"> Edit </a>
+                                            <a href="{{ url_for('delete_subreddit', id=subreddit.id) }}" class="btn btn-danger btn-sm" onclick="return confirmDelete('{{ subreddit.name }}')">Delete</a>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    {% if subreddits.has_prev %}
+                        <a href="{{ url_for('index', page=subreddits.prev_num, per_page=per_page, sort_by=sort_by, direction=direction) }}" class="btn btn-secondary">Previous</a>
+                        <!--<a href="{{ url_for('index', page=subreddits.prev_num, per_page=per_page, sort_by=sort_by, direction=direction) }}" class="btn btn-secondary">Previous</a> -->
+                    {% endif %}
+                    {% if subreddits.has_next %}
+                        <a href="{{ url_for('index', page=subreddits.next_num, per_page=per_page, sort_by=sort_by, direction=direction) }}" class="btn btn-secondary">Next</a>
+                        <!-- <a href="{{ url_for('index', page=subreddits.next_num, per_page=per_page, sort_by=sort_by, direction=direction) }}" class="btn btn-secondary">Next</a>-->
+                    {% endif %}
+                </div>
+                <a href="{{ url_for('add_subreddit') }}" class="btn btn-success mt-4">Add New Subreddit</a>
+                <a href="{{ url_for('view_log') }}" class="btn btn-info mt-4">View Change Log</a>
+                <a href="{{ url_for('deleted_entries') }}" class="btn btn-warning mt-4">View Deleted Entries</a>
+                <a href="{{ url_for('export') }}" class="btn btn-dark mt-4">Export Active Subscriptions</a>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="alert alert-dismissible fade show mt-4">
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+        
+        <script>
+            function openNav() {
+                document.getElementById("mySidebar").style.width = "200px";
+                document.getElementById("main").style.marginLeft = "200px";
+            }
+
+            function closeNav() {
+                document.getElementById("mySidebar").style.width = "0";
+                document.getElementById("main").style.marginLeft = "0";
+            }
+
+            $(document).ready(function() {
+                $('#subscriptionsTable').DataTable({
+                    "paging": true, // pagination = True
+                    "searching": true,
+                    "ordering": true,
+                    "info": true   // Info = True
+                });
+            });
+
+            function confirmDelete(name) {
+                return confirm('Are you sure you want to delete the subreddit: ' + name + '?');
+            }
+
+            const toggleButton = document.querySelector('.toggle-button');
+            const toggleIcon = document.querySelector('#toggle-icon');
+
+            let amoledMode = false;
+
+            toggleButton.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark-mode');
+                amoledMode = !amoledMode;
+                toggleIcon.textContent = amoledMode ? 'nightlight_round': 'wb_sunny';
+            });
+        </script>
+    </body>
+</html>
