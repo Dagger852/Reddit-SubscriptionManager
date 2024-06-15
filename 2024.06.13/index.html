@@ -126,7 +126,7 @@
             <h3>Sidebar</h3>
             <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
             <button id="initialSetupButton" class="btn btn-primary mt-4">Initial Setup</button>
-            <a href="#">Sync Subscriptions</a>
+            <a href="javascript:void(0)" id="syncSubscriptionsLink">Sync Subscriptions</a>
             <a href="#">Export as CSV</a>
             <a href="#">View Change Log</a>
             <a href="#">View Deleted Entries</a>
@@ -143,7 +143,14 @@
                         <thead>
                             <tr>
                                 <th>Name</th>
-                                <th>Type</th>
+                                <th>
+                                    Type
+                                    <select id="typeFilter" class="form-control" style="display: inline-block; width: auto; margin-left: 10px;">
+                                        <option value="">All</option>
+                                        <option value="Subreddit">Subreddit</option>
+                                        <option value="User">User</option>
+                                    </select>
+                                </th>
                                 <th>Rank</th>
                                 <th>VIP</th>
                                 <th>Free</th>
@@ -155,39 +162,33 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {% for subreddit in subreddits.items %}
-                                {% if not subreddit.deleted %}
-                                    <tr>
-                                        <td><a href="{{ subreddit.url }}" target="_blank">{{ subreddit.name }}</a></td>
-                                        <td>{{ subreddit.type }}</td>
-                                        <td>{{ subreddit.rank }}</td>
-                                        <td>{{ subreddit.vip }}</td>
-                                        <td>{{ subreddit.free }}</td>
-                                        <td>{{ subreddit.rr }}</td>
-                                        <td>{{ subreddit.pp }}</td>
-                                        <td>{{ subreddit.alt_acct1 }}</td>
-                                        <td>{{ subreddit.alt_acct2 }}</td>
-                                        <td>{{ subreddit.tags }}</td>
-                                        <td>
-                                            <a href="{{ url_for('edit_subreddit', id=subreddit.id) }}" class="btn btn-primary btn-sm"> Edit </a>
-                                            <a href="{{ url_for('delete_subreddit', id=subreddit.id) }}" class="btn btn-danger btn-sm" onclick="return confirmDelete('{{ subreddit.name }}')">Delete</a>
-                                        </td>
-                                    </tr>
-                                {% endif %}
-                            {% endfor %}
-                        </tbody>
+                        
+                        {% for subreddit in subreddits.items %}
+                        {% if not subreddit.deleted %}
+                            <tr>
+                                <td><a href="{{ subreddit.url }}" target="_blank">{{ subreddit.name }}</a></td>
+                                <td>{{ subreddit.type }}</td>
+                                <td>{{ subreddit.rank }}</td>
+                                <td>{{ subreddit.vip }}</td>
+                                <td>{{ subreddit.free }}</td>
+                                <td>{{ subreddit.rr }}</td>
+                                <td>{{ subreddit.pp }}</td>
+                                <td>{{ subreddit.alt_acct1 }}</td>
+                                <td>{{ subreddit.alt_acct2 }}</td>
+                                <td>{{ subreddit.tags }}</td>
+                                <td>
+                                    <a href="{{ url_for('edit_subreddit', id=subreddit.id) }}" class="btn btn-primary btn-sm"> Edit </a>
+                                    <!--<a href="{{ url_for('delete_subreddit', id=subreddit.id) }}" class="btn btn-danger btn-sm" onclick="return confirmDelete('{{ subreddit.name }}')">Delete</a>-->
+                                    <button class="btn btn-danger btn-sm" onclick="confirmDelete('{{ subreddit.id }}', '{{ subreddit.name }}')">Delete</button>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
                     </table>
                 </div>
+                
                 <div>
-                    {% if subreddits.has_prev %}
-                        <a href="{{ url_for('index', page=subreddits.prev_num, per_page=per_page, sort_by=sort_by, direction=direction) }}" class="btn btn-secondary">Previous</a>
-                        <!--<a href="{{ url_for('index', page=subreddits.prev_num, per_page=per_page, sort_by=sort_by, direction=direction) }}" class="btn btn-secondary">Previous</a> -->
-                    {% endif %}
-                    {% if subreddits.has_next %}
-                        <a href="{{ url_for('index', page=subreddits.next_num, per_page=per_page, sort_by=sort_by, direction=direction) }}" class="btn btn-secondary">Next</a>
-                        <!-- <a href="{{ url_for('index', page=subreddits.next_num, per_page=per_page, sort_by=sort_by, direction=direction) }}" class="btn btn-secondary">Next</a>-->
-                    {% endif %}
+                    <!-- Pagination controls will be handled by DataTables -->
                 </div>
                 <a href="{{ url_for('add_subreddit') }}" class="btn btn-success mt-4">Add New Subreddit</a>
                 <a href="{{ url_for('view_log') }}" class="btn btn-info mt-4">View Change Log</a>
@@ -216,12 +217,92 @@
                 document.getElementById("main").style.marginLeft = "0";
             }
 
+            function confirmDelete(id, name) {
+                if (confirm(`Are you sure you want to delete the subreddit: ${name}?`)) {
+                    fetch(`/delete_subreddit/${id}`, {
+                        method: 'POST'
+                    }).then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        } else {
+                            alert('Failed to delete subreddit.');
+                        }
+                    });
+                }
+            }
+
+            function refreshSubscriptions() {
+                $.post("/refresh_subscriptions", function() {
+                    location.reload();
+                });
+            }
+
+            // Attach click event to the Sync Subscriptions link
+            document.getElementById('syncSubscriptionsLink').addEventListener('click', function() {
+                refreshSubscriptions();
+            });
+
             $(document).ready(function() {
-                $('#subscriptionsTable').DataTable({
-                    "paging": true, // pagination = True
+                var table = $('#subscriptionsTable').DataTable({
+                    "paging": true,
                     "searching": true,
-                    "ordering": true,
-                    "info": true   // Info = True
+                    "info": false,
+                    "pageLength": 25,
+                    "lengthMenu": [10, 25, 50, 75, 100],
+                    "ordering": true, // Enable ordering
+                    "order": [[0, 'asc']], // Default sort by the first column ('name') in ascending order
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        "url": "/search",
+                        "type": "GET",
+                        "data": function (d) {
+                            d.search.value = $('#subscriptionsTable_filter input').val(); // Get the search box value
+                            d.type = $('#typeFilter').val(); // Get the type filter value
+                        },
+                        "dataSrc": function(json) {
+                            if (json.error) {
+                                alert(json.error);
+                                return [];
+                            }
+                            return json.data;
+                        }
+                    },
+                    "columns": [
+                        { 
+                            "data": "name",
+                            "orderable": true, // Enable ordering for 'name' column
+                            "render": function(data, type, row) {
+                                return data; // Already contains the HTML link
+                            }
+                        },
+                        { "data": "type", "orderable": false },
+                        { 
+                            "data": "rank",
+                            "orderable": true // Enable ordering for 'rank' column
+                        },
+                        { "data": "vip", "orderable": false },
+                        { "data": "free", "orderable": false },
+                        { "data": "rr", "orderable": false },
+                        { "data": "pp", "orderable": false },
+                        { "data": "alt_acct1", "orderable": false },
+                        { "data": "alt_acct2", "orderable": false },
+                        { "data": "tags", "orderable": false },
+                        { 
+                            "data": "actions", 
+                            "orderable": false
+                        }
+                    ]
+                });
+
+                // Ensure the search box value is updated
+                $('#subscriptionsTable_filter input').on('keyup', function() {
+                    table.ajax.reload();
+                });
+
+                // Reload DataTable when type filter changes
+                $('#typeFilter').on('change', function() {
+                    table.ajax.reload();
                 });
             });
 
