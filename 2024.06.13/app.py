@@ -1,6 +1,6 @@
 import csv
 import logging
-from flask import Flask, render_template, request, redirect, url_for, flash, make_response
+from flask import Flask, render_template, request, redirect, url_for, flash, make_response, jsonify
 from flask_migrate import Migrate
 from config import Config
 from models import db, Subreddit, ChangeLog
@@ -34,7 +34,20 @@ reddit = praw.Reddit(
 # print(reddit.auth.authorize(code))
 print(reddit.user.me())
 
-@app.before_first_request
+@app.route('/refresh_subscriptions', methods=['POST'])
+def trigger_refresh_subscriptions():
+    refresh_subscriptions()
+    flash('Subscriptions have been refreshed successfully.', 'success')
+    return redirect(url_for('index'))
+
+# Ensure your setup function only sets up the database without refreshing subscriptions
+def setup():
+    logger.info("Setting up the database.")
+    with app.app_context():
+        db.create_all()
+
+
+# @app.before_first_request
 def setup():
     logger.info("Setting up the database and refreshing subscriptions.")
     with app.app_context():
@@ -82,6 +95,7 @@ def check_deleted_users():
                 log_file.write(f"{user}\n")
         flash(f"Deleted users detected: {', '.join(deleted_users)}", 'warning')
 
+# This needs to be adjusted
 def refresh_subscriptions():
     logger.info("Refreshing subscriptions from Reddit.")
     subreddits = list(reddit.user.subreddits(limit=None))
@@ -183,6 +197,86 @@ def index():
     logger.info(f"Displaying page {page} of subreddits sorted by {sort_by} in {direction} order.")
 
     return render_template('index.html', subreddits=subreddits, sort_by=sort_by, direction=direction, per_page=per_page)
+
+@app.route('/search', methods=['GET'])
+def search_subreddits():
+    query = request.args.get('search[value]', '').strip()
+    type_filter = request.args.get('type', '').strip()
+    start = request.args.get('start', 0, type=int)
+    length = request.args.get('length', 25, type=int)
+    draw = request.args.get('draw', type=int)
+    
+    order_column_index = request.args.get('order[0][column]', type=int)
+    order_direction = request.args.get('order[0][dir]', 'asc')
+    
+    columns = ['name', 'type', 'rank', 'vip', 'free', 'rr', 'pp', 'alt_acct1', 'alt_acct2', 'tags']
+    order_column = columns[order_column_index]
+
+    logger.info(f"Search query: '{query}', Type filter: '{type_filter}', Start: {start}, Length: {length}, Draw: {draw}, Order column: {order_column}, Order direction: {order_direction}")
+
+    try:
+        search_filter = Subreddit.query.filter(Subreddit.deleted == False)
+        if query:
+            search_filter = search_filter.filter(
+                Subreddit.name.ilike(f'%{query}%') |
+                Subreddit.type.ilike(f'%{query}%') |
+                Subreddit.title.ilike(f'%{query}%') |
+                Subreddit.tags.ilike(f'%{query}%')
+            )
+        if type_filter:
+            search_filter = search_filter.filter(Subreddit.type == type_filter)
+
+        if order_direction == 'asc':
+            search_filter = search_filter.order_by(getattr(Subreddit, order_column).asc())
+        else:
+            search_filter = search_filter.order_by(getattr(Subreddit, order_column).desc())
+
+        total_filtered = search_filter.count()
+        logger.info(f"Total filtered records: {total_filtered}")
+
+        results = search_filter.offset(start).limit(length).all()
+        total_records = Subreddit.query.filter(Subreddit.deleted == False).count()
+        logger.info(f"Total records: {total_records}")
+
+        subreddits = [{
+            'name': f'<a href="{sub.url}" target="_blank">{sub.name}</a>',
+            'type': sub.type,
+            'title': sub.title,
+            'url': sub.url,
+            'rank': sub.rank,
+            'vip': sub.vip,
+            'free': sub.free,
+            'rr': sub.rr,
+            'pp': sub.pp,
+            'alt_acct1': sub.alt_acct1,
+            'alt_acct2': sub.alt_acct2,
+            'tags': sub.tags,
+            'actions': f'<a href="{url_for("edit_subreddit", id=sub.id)}" class="btn btn-primary btn-sm">Edit</a> '
+                       f'<a href="{url_for("delete_subreddit", id=sub.id)}" class="btn btn-danger btn-sm" onclick="return confirmDelete(\'{sub.name}\')">Delete</a>'
+        } for sub in results]
+
+        response = jsonify({
+            'draw': draw,
+            'recordsTotal': total_records,
+            'recordsFiltered': total_filtered,
+            'data': subreddits
+        })
+        response.status_code = 200
+    except Exception as e:
+        logger.error(f"Error processing search query: {str(e)}")
+        response = jsonify({
+            'draw': draw,
+            'recordsTotal': 0,
+            'recordsFiltered': 0,
+            'data': [],
+            'error': 'An error occurred while processing your request.'
+        })
+        response.status_code = 500
+
+    return response
+
+
+
 
 # delete subreddit entry
 @app.route('/deleted')
